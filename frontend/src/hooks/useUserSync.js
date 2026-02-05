@@ -8,18 +8,28 @@ function useUserSync() {
   const { isSignedIn } = useAuth();
   const { user } = useUser();
 
-  const { mutate: syncUserMutation, isPending, isSuccess } = useMutation({ mutationFn: syncUser });
+const {
+  mutate: syncUserMutation,
+  isPending,
+  isSuccess,
+  isError,
+  reset,
+} = useMutation({ mutationFn: syncUser });
 
   useEffect(() => {
-    if (isSignedIn && user && !isPending && !isSuccess) {
+    if (isSignedIn && user && !isPending && !isSuccess && !isError) {
       syncUserMutation({
         email: user.primaryEmailAddress?.emailAddress,
         name: user.fullName || user.firstName,
         imageUrl: user.imageUrl,
       });
     }
-  }, [isSignedIn, user, syncUserMutation, isPending, isSuccess]);
+}, [isSignedIn, user, syncUserMutation, isPending, isSuccess, isError]);
 
+useEffect(() => {
+   // Reset when user identity changes or sign-out occurs so sync can run again
+  reset();
+}, [user?.id, isSignedIn, reset]);
   return { isSynced: isSuccess };
 }
 
