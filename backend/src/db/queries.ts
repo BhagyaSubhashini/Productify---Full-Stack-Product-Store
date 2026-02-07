@@ -19,8 +19,7 @@ export const getUserById = async (id: string) => {
   return db.query.users.findFirst({ where: eq(users.id, id) });
 };
 
-type UserUpdate = Omit<NewUser, "createdAt" | "updatedAt">;
-export const updateUser = async (id: string, data: Partial<UserUpdate>) => {
+export const updateUser = async (id: string, data: Partial<NewUser>) => {
   const existingUser = await getUserById(id);
   if (!existingUser) {
     throw new Error(`User with id ${id} not found`);
@@ -32,20 +31,20 @@ export const updateUser = async (id: string, data: Partial<UserUpdate>) => {
 
 // upsert => create or update
 
-export const upsertUser = async (data: UserUpdate) => {
+export const upsertUser = async (data: NewUser) => {
   // this is what we have done first
   // const existingUser = await getUserById(data.id);
   // if (existingUser) return updateUser(data.id, data);
 
   // return createUser(data);
 
-  // and this is what CodeRabbit suggested
+  // and this is what CR suggested
   const [user] = await db
     .insert(users)
     .values(data)
     .onConflictDoUpdate({
       target: users.id,
-      set: { email: data.email, name: data.name, imageUrl: data.imageUrl },
+      set: data,
     })
     .returning();
   return user;
@@ -86,8 +85,8 @@ export const getProductsByUserId = async (userId: string) => {
   });
 };
 
-type ProductUpdate = Omit<NewProduct, "id" | "createdAt" | "updatedAt">;
-export const updateProduct = async (id: string, data: Partial<ProductUpdate>) => {  const existingProduct = await getProductById(id);
+export const updateProduct = async (id: string, data: Partial<NewProduct>) => {
+  const existingProduct = await getProductById(id);
   if (!existingProduct) {
     throw new Error(`Product with id ${id} not found`);
   }
@@ -128,6 +127,3 @@ export const getCommentById = async (id: string) => {
     with: { user: true },
   });
 };
-
-
-
