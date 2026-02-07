@@ -8,21 +8,20 @@ export const createComment = async (req: Request, res: Response) => {
     const { userId } = getAuth(req);
     if (!userId) return res.status(401).json({ error: "Unauthorized" });
 
-    const { productId } = req.params;
+    const productIdParam = req.params.productId;
+    const productId = Array.isArray(productIdParam) ? productIdParam[0] : productIdParam;
     const { content } = req.body;
 
     if (!content) return res.status(400).json({ error: "Comment content is required" });
 
-    const productIdStr = Array.isArray(productId) ? productId[0] : productId;
-
     // verify product exists
-    const product = await queries.getProductById(productIdStr);
+    const product = await queries.getProductById(productId);
     if (!product) return res.status(404).json({ error: "Product not found" });
 
     const comment = await queries.createComment({
       content,
       userId,
-      productId: productIdStr,
+      productId,
     });
 
     res.status(201).json(comment);
@@ -38,17 +37,18 @@ export const deleteComment = async (req: Request, res: Response) => {
     const { userId } = getAuth(req);
     if (!userId) return res.status(401).json({ error: "Unauthorized" });
 
-    const { commentId } = req.params;
+    const commentIdParam = req.params.commentId;
+    const commentId = Array.isArray(commentIdParam) ? commentIdParam[0] : commentIdParam;
 
     // check if comment exists and belongs to user
-    const existingComment = await queries.getCommentById(Array.isArray(commentId) ? commentId[0] : commentId);
+    const existingComment = await queries.getCommentById(commentId);
     if (!existingComment) return res.status(404).json({ error: "Comment not found" });
 
     if (existingComment.userId !== userId) {
       return res.status(403).json({ error: "You can only delete your own comments" });
     }
 
-    await queries.deleteComment(Array.isArray(commentId) ? commentId[0] : commentId);
+    await queries.deleteComment(commentId);
     res.status(200).json({ message: "Comment deleted successfully" });
   } catch (error) {
     console.error("Error deleting comment:", error);
