@@ -1,6 +1,6 @@
 import { ArrowLeftIcon, EditIcon, Trash2Icon, CalendarIcon, UserIcon } from "lucide-react";
 import LoadingSpinner from "../components/LoadingSpinner";
-import CommentsSection from "../components/CommentsSection";
+import CommentsSection from "../components/CommentsSection.jsx";
 import { useAuth } from "@clerk/clerk-react";
 import { useProduct, useDeleteProduct } from "../hooks/useProducts";
 import { useParams, Link, useNavigate } from "react-router";

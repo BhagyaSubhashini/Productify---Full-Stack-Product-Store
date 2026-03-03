@@ -55,7 +55,7 @@ function HomePage() {
           All Products
         </h2>
 
-        {products.length === 0 ? (
+        {!Array.isArray(products) || products.length === 0 ? (
           <div className="card bg-base-300">
             <div className="card-body items-center text-center py-16">
               <PackageIcon className="size-16 text-base-content/20" />

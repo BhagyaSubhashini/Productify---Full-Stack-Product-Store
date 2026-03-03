@@ -7,7 +7,7 @@ import { getAuth } from "@clerk/express";
 export const getAllProducts = async (req: Request, res: Response) => {
   try {
     const products = await queries.getAllProducts();
-    res.status(200).json(products);
+    res.status(200).json(Array.isArray(products) ? products : []);
   } catch (error) {
     console.error("Error getting products:", error);
     res.status(500).json({ error: "Failed to get products" });
@@ -21,7 +21,7 @@ export const getMyProducts = async (req: Request, res: Response) => {
     if (!userId) return res.status(401).json({ error: "Unauthorized" });
 
     const products = await queries.getProductsByUserId(userId);
-    res.status(200).json(products);
+    res.status(200).json(Array.isArray(products) ? products : []);
   } catch (error) {
     console.error("Error getting user products:", error);
     res.status(500).json({ error: "Failed to get user products" });
